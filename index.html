@@ -5,6 +5,7 @@
                 margin-left: 50%;
                 margin-top: 50px;
                 transform: translateX(-50%);
+                width: 800px;
             }
 
             h1 {
@@ -19,40 +20,49 @@
             }
         </style>
     </head>
+
     <body>
         <div class="content">
             <h1 id="show-value"></h1>
             <input id="input-value" placeholder="new value" type="text" />
             <input id="submit-value" type="submit" value="Set Value" />
         </div>
+
+        <!-- Load the ethers-app library -->
         <script src="https://cdn.ethers.io/scripts/ethers-app-v0.5.js" type="text/javascript"></script>
-        <script>
-            // local: 0x9FBDa871d559710256a2502A2517b794B482Db40';
 
-            var contractAddress = '0x2B45402b5A8FB53Cb00c46B5e6338627D186a2B0';
-            var abi = [{"constant":true,"inputs":[],"name":"value","outputs":[{"name":"","type":"string"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":false,"inputs":[{"name":"value","type":"string"}],"name":"setValue","outputs":[],"payable":false,"stateMutability":"nonpayable","type":"function"},{"anonymous":false,"inputs":[{"indexed":true,"name":"author","type":"address"},{"indexed":false,"name":"oldValue","type":"string"},{"indexed":false,"name":"newValue","type":"string"}],"name":"ValueChanged","type":"event"}];
-            var contract = app.getContract(contractAddress, abi);
-
-            function updateValue(value) {
+        <script type="text/javascript">
+            // Updates the header content
+            function updateDisplay(value) {
                 document.getElementById('show-value').textContent = value;
             }
 
-            contract.value().then(function(value) {
-                updateValue(value);
-                contract.onvaluechanged = function(author, oldValue, newValue) {
-                    updateValue(newValue);
+            // Load the contract. This JSON file is created by the deploy-contract.js script
+            app.getContract('simple-store.json').then(function(contract) {
+
+                // Get the current value (for initial display)
+                contract.value().then(function(value) {
+                    updateDisplay(value);
+
+                    // Set up an event whenever the value changes
+                    contract.onvaluechanged = function(author, oldValue, newValue) {
+                        updateDisplay(newValue);
+                    };
+                });
+
+                // Whenever the user types in a new value...
+                document.getElementById('submit-value').onclick = function() {
+                    var input = document.getElementById('input-value');
+
+                    // ... set the value
+                    contract.setValue(input.value).then(function(tx) {
+                        console.log(tx);
+                        input.value = '';
+                    }, function (error) {
+                        console.log(error);
+                    })
                 };
             });
-
-            document.getElementById('submit-value').onclick = function() {
-                var input = document.getElementById('input-value');
-                contract.setValue(input.value).then(function(tx) {
-                    console.log(tx);
-                    input.value = '';
-                }, function (error) {
-                    console.log(error);
-                })
-            }
         </script>
     </body>
 </html>
