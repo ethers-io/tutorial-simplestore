@@ -1,6 +1,8 @@
 Tutorial: Simple Store
 ======================
 
+THIS IS MY FIRST CONTRIBUTION
+
 *This file is very much a work in progress. This file is still under substantial
 development. If you are new to Ethereum, this is likely not ready for you yet. It
 is posted mostly to get some early feedback. Thanks!*
